@@ -4,7 +4,7 @@ void getChunkInfo (const char *filename,
 		   const char* datasetName,
 		   int rowsPerChunk, int columnsPerChunk,
 		   int nRowsOfChunks, int nColumnsOfChunks,
-		   haddr_t ** chunkSizeInBytesAddress,
-		   hsize_t *** allChunkOffsetsAddress, hsize_t * maxChunkSize,
+		   haddr_t * chunkSizeInBytes,
+		   hsize_t ** allChunkOffsets, hsize_t * maxChunkSize,
 		   int printFlag);
 #endif
