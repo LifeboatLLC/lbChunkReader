@@ -1,3 +1,5 @@
+Build.txt specifies how to build the executable.
+
 lbChunkReader <filename> <rowsPerChunk> <columnPerChunk> 
                          <nRowsOfChunks> <nColumnsOfChunks> 
 			 <nThreads> <copyToArray> <nIterations>
