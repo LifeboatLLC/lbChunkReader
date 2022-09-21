@@ -18,6 +18,7 @@ clock_t readDirectlyWithThreads (const char *filename,
 	hsize_t * chunkSizeInBytes,
 	hsize_t ** allChunkOffsets,
 	hsize_t maxChunkSize,
+	int copyToArray,
 	int nThreads, 
 	int nIterations, 
         int printFlag)
@@ -37,8 +38,10 @@ clock_t readDirectlyWithThreads (const char *filename,
   struct WorkerParameters *params =
        malloc (sizeof (struct WorkerParameters) * nThreads);
 
-  // Allocate array of thread read buffers
+  // Allocate array of thread read buffer pointers.
   int **threadReadBuffer = malloc (sizeof (int *) * nThreads);
+
+  // Allocate the thread read buffers.
   int i;
   for (i = 0; i < nThreads; i++)
   {
@@ -55,7 +58,7 @@ clock_t readDirectlyWithThreads (const char *filename,
     nThreads = nChunks;
   }
 
-  // Compute number of chunks/thread
+  // Compute number of chunks/thread.
   // If nChunks not divisible by nThreads,
   // excessChunks provides the number of threads
   // that will read an extra chunk.
@@ -77,6 +80,7 @@ clock_t readDirectlyWithThreads (const char *filename,
 			 nChunksToRead, rowsPerChunk,
 			 columnsPerChunk, nRowsOfChunks,
 			 nColumnsOfChunks, threadReadBuffer[i],
+                         copyToArray,
 			 rdata, fd, nIterations);
     startChunkNumber += nChunksToRead;
   }
@@ -96,7 +100,7 @@ clock_t readDirectlyWithThreads (const char *filename,
     pthread_create (id + i, NULL, worker, (void *) (params + i));
   }
 
-  // Wait for all threads to complete
+  // Wait for all threads to complete.
   for (i = 0; i < nThreads; ++i)
   {
     pthread_join (id[i], NULL);
@@ -105,16 +109,23 @@ clock_t readDirectlyWithThreads (const char *filename,
   // Record time
   clock_t endThread = clock ();
 
-  // Free all allocated memory
+  // Free all allocated memory.
+
+  // Free the thread buffers.
   for (i = 0; i < nThreads; ++i)
   {
     free (threadReadBuffer[i]);
   }
+
+  // Free the thread buffer pointers.
   free (threadReadBuffer);
+
+  // Free the arary of thread ids.
   free (id);
+
+  // Free the array of parameter structures.
   free (params);
 
+  // Return the processing time.
   return endThread - beginThread;
 }
-
-

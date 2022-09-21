@@ -12,38 +12,32 @@ clock_t readDirectly (const char *filename, int **rdata,
 		      int nRowsOfChunks, int nColumnsOfChunks,
 		      hsize_t * chunkSizeInBytes,
 		      hsize_t ** chunkLocationInFile,
+		      hsize_t maxChunkSize,
+		      int copyToArray, 
 		      int nIterations, int printFlag)
 {
   int nArrayRows = rowsPerChunk * nRowsOfChunks;
   int nArrayColumns = columnsPerChunk * nColumnsOfChunks;
   int nChunks = nRowsOfChunks * nColumnsOfChunks;
+
   /* 
    * Initialize the read array.
    */
   memset (rdata[0], 0, nArrayRows * nArrayColumns * sizeof (int));
-  /* 
-   * Read the data using the previously defined hyperslab.
-   */
+
   // Open the file
   FILE *directFile = fopen (filename, "rb");
 
   // Extract the file descriptor
   int fd = fileno (directFile);
 
-  // Find the maximum chunk size.
-  // In this example all chunks should be the same size.
-  int maxChunkSize = 0;
-  int j;
-
-  for (j = 0; j < nChunks; j++)
-    maxChunkSize = (maxChunkSize < chunkSizeInBytes[j]) ?
-	 chunkSizeInBytes[j] : maxChunkSize;
-
+  // Create the read buffer for chunks
   int *chunkBuffer = malloc (maxChunkSize * sizeof (int));
-  int row;
-  int column;
-  printf ("Reading direct\n");
+
+  // Start the timer
   clock_t beginDirect = clock ();
+
+  // Repeat the reads for the specified number of iterations
   int iteration;
   for (iteration = 0; iteration < nIterations; ++iteration)
   {
@@ -58,29 +52,38 @@ clock_t readDirectly (const char *filename, int **rdata,
     int readColumn = 0;
     int nBytes = 0;
 
+    // For every row of chunks
     for (readRow = 0; readRow < nRowsOfChunks; ++readRow)
     {
+      // For every column of chunks
       for (readColumn = 0; readColumn < nColumnsOfChunks; ++readColumn)
       {
+	// Read a chunk using the file offset and chunk size extracted
+	// from the HDF5 file.
 	nBytes = pread (fd, chunkBuffer, chunkSizeInBytes[chunkIndex++],
 			(off_t) chunkLocationInFile[readRow][readColumn]);
 
-	readBufferIndex = 0;
-	for (int chunkRow = 0; chunkRow < rowsPerChunk; ++chunkRow)
+	// Copy the chunk into the 2d Array
+	if (copyToArray)
 	{
-	  for (int chunkColumn = 0; chunkColumn < columnsPerChunk;
-	       ++chunkColumn)
+	  readBufferIndex = 0;
+	  for (int chunkRow = 0; chunkRow < rowsPerChunk; ++chunkRow)
 	  {
-	    rdata[arrayRow + chunkRow][arrayColumn + chunkColumn] =
-		 chunkBuffer[readBufferIndex++];
+	    for (int chunkColumn = 0; chunkColumn < columnsPerChunk;
+		 ++chunkColumn)
+	    {
+	      rdata[arrayRow + chunkRow][arrayColumn + chunkColumn] =
+		   chunkBuffer[readBufferIndex++];
+	    }
 	  }
-	}
 
-	arrayColumn += columnsPerChunk;
-	if (arrayColumn >= columnsPerChunk * nColumnsOfChunks)
-	{
-	  arrayColumn = 0;
-	  arrayRow += rowsPerChunk;
+	  // Calclulate the next array locations
+	  arrayColumn += columnsPerChunk;
+	  if (arrayColumn >= columnsPerChunk * nColumnsOfChunks)
+	  {
+	    arrayColumn = 0;
+	    arrayRow += rowsPerChunk;
+	  }
 	}
       }
     }
@@ -92,5 +95,3 @@ clock_t readDirectly (const char *filename, int **rdata,
   free (chunkBuffer);
   return directSpan;
 }
-
-

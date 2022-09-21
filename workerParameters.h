@@ -12,6 +12,7 @@ struct WorkerParameters
   int nRowsOfChunks;
   int nColumnsOfChunks;
   int *readBuffer;
+  int copyToArray;
   int **bigArray;
   int fd;
   int nIterations;
@@ -27,6 +28,7 @@ void setWorkerParameters (struct WorkerParameters *params,
 			  int nRowsOfChunks,
 			  int nColumnsOfChunks,
 			  int *readBuffer,
+                          int copyToArray,
 			  int **bigArray, int fd, int nIterations);
 
 void freeWorkerParameters (struct WorkerParameters *params);

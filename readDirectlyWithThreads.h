@@ -10,6 +10,7 @@ clock_t readDirectlyWithThreads (const char *filename,
 	hsize_t * chunkSizeInBytes,
 	hsize_t ** allChunkOffsets,
 	hsize_t maxChunkSize,
+	int copyToArray,
 	int nThreads, 
 	int nIterations, 
         int printFlag);

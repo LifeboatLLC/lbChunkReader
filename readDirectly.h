@@ -8,5 +8,7 @@ clock_t readDirectly (const char *filename, int **rdata,
 		      int nRowsOfChunks, int nColumnsOfChunks,
 		      hsize_t * chunkSizeInBytes,
 		      hsize_t ** chunkLocationInFile,
+                      hsize_t maxChunkSize,
+		      int copyToArray,
 		      int nIterations, int printFlag);
 #endif

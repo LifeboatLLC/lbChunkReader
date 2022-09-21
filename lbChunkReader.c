@@ -21,15 +21,15 @@
 void processCommandLine (int argc, char **argv,
 			 int *rowsPerChunk, int *columnsPerChunk,
 			 int *nRowsOfChunks, int *nColumnsOfChunks,
-			 int *nThreads, int *nIterations, int *printFlag)
+			 int *nThreads, int* copyToArray, int *nIterations, int *printFlag)
 {
-  const int N_ARGS = 8;
+  const int N_ARGS = 9;
 
   if (argc != N_ARGS)
   {
     printf
 	 ("usage: %s <rowsPerChunk> <columnsPerChunk> <nRowsOfChunks> "
-	  "<nColumnsOfChunks> <nThreads> <nIterations> <printDataFlag>\n", argv[0]);
+	  "<nColumnsOfChunks> <nThreads> <copyToArray> <nIterations> <printDataFlag>\n", argv[0]);
     exit (0);
   }
   else
@@ -39,8 +39,9 @@ void processCommandLine (int argc, char **argv,
     sscanf (argv[3], "%d", nRowsOfChunks);
     sscanf (argv[4], "%d", nColumnsOfChunks);
     sscanf (argv[5], "%d", nThreads);
-    sscanf (argv[6], "%d", nIterations);
-    sscanf (argv[7], "%d", printFlag);
+    sscanf (argv[6], "%d", copyToArray);
+    sscanf (argv[7], "%d", nIterations);
+    sscanf (argv[8], "%d", printFlag);
 
     if (*printFlag)
     {
@@ -49,6 +50,7 @@ void processCommandLine (int argc, char **argv,
       printf ("Number of rows of chunks = %d\n", *nRowsOfChunks);
       printf ("Number of columns of chunks = %d\n", *nColumnsOfChunks);
       printf ("Number of threads = %d\n", *nThreads);
+      printf ("Copy to array = %d\n", *copyToArray);
       printf ("Number of iterations = %d\n", *nIterations);
     }
   }
@@ -63,12 +65,14 @@ int main (int argc, char **argv)
   int nColumnsOfChunks;
   int nThreads;
   int nIterations;
+  int copyToArray;
   int printFlag;
 
   processCommandLine (argc, argv,
 		      &rowsPerChunk, &columnsPerChunk,
 		      &nRowsOfChunks, &nColumnsOfChunks,
-		      &nThreads, &nIterations, &printFlag);
+		      &nThreads, &copyToArray, &nIterations, 
+		      &printFlag);
 
 
   hid_t file, space, dset, dcpl;	/* Handles */
@@ -120,13 +124,17 @@ int main (int argc, char **argv)
 		chunkSizeInBytes, allChunkOffsets, &maxChunkSize, printFlag);
 
 
+  printf ("Reading direct\n");
   clock_t directSpan = readDirectly (FILENAME,
 				     rdata,
 				     rowsPerChunk, columnsPerChunk,
 				     nRowsOfChunks, nColumnsOfChunks,
 				     chunkSizeInBytes,
 				     allChunkOffsets,
-				     nIterations, printFlag);
+				     maxChunkSize,
+                                     copyToArray,
+				     nIterations, 
+                                     printFlag);
 
 
   printf ("Direct time = %ld\n\n", directSpan);
@@ -142,7 +150,8 @@ int main (int argc, char **argv)
 						nRowsOfChunks, nColumnsOfChunks,
 						chunkSizeInBytes,
 						allChunkOffsets,
-						maxChunkSize, nThreads,
+						maxChunkSize, copyToArray, 
+                                                nThreads,
 						nIterations, printFlag);
 
   printf ("Thread time is %ld\n\n", threadSpan);

@@ -15,6 +15,7 @@ void setWorkerParameters (struct WorkerParameters *params,
 			  int nRowsOfChunks,
 			  int nColumnsOfChunks,
 			  int *readBuffer,
+                          int copyToArray,
 			  int **bigArray, int fd, int nIterations)
 {
   params->chunkLocationInFile = chunkLocationInFile;
@@ -26,6 +27,7 @@ void setWorkerParameters (struct WorkerParameters *params,
   params->nRowsOfChunks = nRowsOfChunks;
   params->nColumnsOfChunks = nColumnsOfChunks;
   params->readBuffer = readBuffer;
+  params->copyToArray = copyToArray;
   params->bigArray = bigArray;
   params->fd = fd;
   params->nIterations = nIterations;
