@@ -10,18 +10,16 @@
 
 // Create one or more threads to read an HDF file directly.
 clock_t readDirectlyWithThreads (const char *filename,
-	int **rdata,
-	int rowsPerChunk,
-	int columnsPerChunk,
-	int nRowsOfChunks,
-	int nColumnsOfChunks,
-	hsize_t * chunkSizeInBytes,
-	hsize_t ** allChunkOffsets,
-	hsize_t maxChunkSize,
-	int copyToArray,
-	int nThreads, 
-	int nIterations, 
-        int printFlag)
+				 int **rdata,
+				 int rowsPerChunk,
+				 int columnsPerChunk,
+				 int nRowsOfChunks,
+				 int nColumnsOfChunks,
+				 hsize_t * chunkSizeInBytes,
+				 hsize_t ** allChunkOffsets,
+				 hsize_t maxChunkSize,
+				 int copyToArray,
+				 int nThreads, int nIterations, int printFlag)
 {
   // Open the file
   FILE *directFile = fopen (filename, "rb");
@@ -80,8 +78,7 @@ clock_t readDirectlyWithThreads (const char *filename,
 			 nChunksToRead, rowsPerChunk,
 			 columnsPerChunk, nRowsOfChunks,
 			 nColumnsOfChunks, threadReadBuffer[i],
-                         copyToArray,
-			 rdata, fd, nIterations);
+			 copyToArray, rdata, fd, nIterations);
     startChunkNumber += nChunksToRead;
   }
 

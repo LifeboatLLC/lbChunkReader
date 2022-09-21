@@ -23,25 +23,38 @@ void *worker (void *inStruct)
 
   // Repeat the whole process for the specified number of iterations.
   int iteration;
-  int i, j;
   for (iteration = 0; iteration < params->nIterations; ++iteration)
   {
     int arrayColumn = startArrayColumn;
     int arrayRow = startArrayRow;
     int chunkBufferIndex;
+    int addressRow = params->startChunkNumber / params->nColumnsOfChunks;
+    int addressColumn = params->startChunkNumber % params->nColumnsOfChunks;
+
+    int j;
     for (j = 0; j < params->nChunksToRead; j++)
     {
       // Read a chunk into the chunkBuffer
       pread (params->fd, params->readBuffer, params->chunkSizeInBytes[j],
-	     (off_t) params->chunkLocationInFile[params->startChunkNumber + j]);
+	     (off_t) params->chunkLocationInFile[addressRow][addressColumn]);
 
+      ++addressColumn;
+      if (addressColumn == params->nColumnsOfChunks)
+      {
+	addressColumn = 0;
+	++addressRow;
+      }
+
+      int chunkRow;
+      int chunkColumn;
       // Copy the data from the chunk to the array
       if (params->copyToArray)
       {
 	chunkBufferIndex = 0;
-	for (int chunkRow = 0; chunkRow < params->rowsPerChunk; ++chunkRow)
+	for (chunkRow = 0; chunkRow < params->rowsPerChunk; ++chunkRow)
 	{
-	  for (int chunkColumn = 0; chunkColumn < params->columnsPerChunk;
+	  int chunkColumn;
+	  for (chunkColumn = 0; chunkColumn < params->columnsPerChunk;
 	       ++chunkColumn)
 	  {
 	    params->bigArray[arrayRow + chunkRow][arrayColumn +

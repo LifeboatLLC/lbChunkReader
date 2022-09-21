@@ -13,12 +13,11 @@ clock_t readDirectly (const char *filename, int **rdata,
 		      hsize_t * chunkSizeInBytes,
 		      hsize_t ** chunkLocationInFile,
 		      hsize_t maxChunkSize,
-		      int copyToArray, 
-		      int nIterations, int printFlag)
+		      int copyToArray, int nIterations, int printFlag)
 {
   int nArrayRows = rowsPerChunk * nRowsOfChunks;
   int nArrayColumns = columnsPerChunk * nColumnsOfChunks;
-  int nChunks = nRowsOfChunks * nColumnsOfChunks;
+
 
   /* 
    * Initialize the read array.
@@ -41,16 +40,18 @@ clock_t readDirectly (const char *filename, int **rdata,
   int iteration;
   for (iteration = 0; iteration < nIterations; ++iteration)
   {
-    int arrayRow = 0;
-    int arrayColumn = 0;
-    int chunkRow = 0;
-    int chunkColumn = 0;
     int chunkIndex = 0;
     int readBufferIndex = 0;
 
     int readRow = 0;
     int readColumn = 0;
     int nBytes = 0;
+
+    int chunkRow;
+    int chunkColumn;
+
+    int arrayRow = 0;
+    int arrayColumn = 0;
 
     // For every row of chunks
     for (readRow = 0; readRow < nRowsOfChunks; ++readRow)
@@ -67,10 +68,9 @@ clock_t readDirectly (const char *filename, int **rdata,
 	if (copyToArray)
 	{
 	  readBufferIndex = 0;
-	  for (int chunkRow = 0; chunkRow < rowsPerChunk; ++chunkRow)
+	  for (chunkRow = 0; chunkRow < rowsPerChunk; ++chunkRow)
 	  {
-	    for (int chunkColumn = 0; chunkColumn < columnsPerChunk;
-		 ++chunkColumn)
+	    for (chunkColumn = 0; chunkColumn < columnsPerChunk; ++chunkColumn)
 	    {
 	      rdata[arrayRow + chunkRow][arrayColumn + chunkColumn] =
 		   chunkBuffer[readBufferIndex++];

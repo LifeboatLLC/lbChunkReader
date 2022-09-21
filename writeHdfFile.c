@@ -3,8 +3,8 @@
 
 #define N_DIMENSIONS 2
 
-void writeHdfFile (const char *filename, const char* datasetName,
-                   int **wdata,
+void writeHdfFile (const char *filename, const char *datasetName,
+		   int **wdata,
 		   int rowsPerChunk, int columnsPerChunk,
 		   int nRowsOfChunks, int nColumnsOfChunks, int printFlag)
 {
@@ -86,5 +86,3 @@ void writeHdfFile (const char *filename, const char* datasetName,
   status = H5Sclose (space);
   status = H5Fclose (file);
 }
-
-

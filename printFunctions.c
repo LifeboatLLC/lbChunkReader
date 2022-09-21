@@ -15,5 +15,3 @@ void print2dArray (const char *message, int **data, int nRows, int nColumns)
   }
   printf ("\n");
 }
-
-

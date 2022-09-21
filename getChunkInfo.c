@@ -7,7 +7,7 @@
 // Extract the chunk locations and chunk sizes from an 
 // hdf file.
 void getChunkInfo (const char *filename,
-		   const char* datasetName,
+		   const char *datasetName,
 		   int rowsPerChunk, int columnsPerChunk,
 		   int nRowsOfChunks, int nColumnsOfChunks,
 		   haddr_t * chunkSizeInBytes,
@@ -21,8 +21,6 @@ void getChunkInfo (const char *filename,
   hsize_t stride[N_DIMENSIONS];
   hsize_t block[N_DIMENSIONS];
   hsize_t count[N_DIMENSIONS];
-  hsize_t dims[N_DIMENSIONS];
-  hsize_t chunk[N_DIMENSIONS];
 
   // Determine the total number of chunks
   hsize_t nChunks = nRowsOfChunks * nColumnsOfChunks;
@@ -67,14 +65,18 @@ void getChunkInfo (const char *filename,
   for (index = 0; index < nChunks; index++)
   {
 
+
     status = H5Dget_chunk_info (dset, space, index, chunkOffset,
-				&filter_mask, allChunkOffsets[chunkRow]+chunkColumn,
+				&filter_mask,
+				&allChunkOffsets[chunkRow][chunkColumn],
 				chunkSizeInBytes + index);
 
     if (printFlag)
     {
-      printf ("\tindex = %ld: nBytes %ld: address: %ld\n",
-	      index, chunkSizeInBytes[index], allChunkOffsets[chunkRow][chunkColumn]);
+      printf
+	   ("\tchunkRow = %d: chunkColumn =%d: index = %ld: nBytes %ld: address: %ld\n",
+	    chunkRow, chunkColumn, index, chunkSizeInBytes[index],
+	    allChunkOffsets[chunkRow][chunkColumn]);
     }
 
     if (chunkSizeInBytes[index] > *maxChunkSize)
@@ -88,8 +90,23 @@ void getChunkInfo (const char *filename,
       chunkColumn = 0;
       ++chunkRow;
     }
-
   }
+
   if (printFlag)
+  {
+    int i;
+    int j;
+    int index = 0;
+    for (i = 0; i < nRowsOfChunks; i++)
+    {
+      for (j = 0; j < nColumnsOfChunks; j++)
+      {
+	printf
+	     ("\tchunkRow = %d: chunkColumn =%d: index = %ld: nBytes %ld: address: %ld\n",
+	      i, j, index, chunkSizeInBytes[index++], allChunkOffsets[i][j]);
+      }
+    }
     printf ("\n");
+  }
+
 }

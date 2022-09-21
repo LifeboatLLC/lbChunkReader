@@ -8,8 +8,8 @@
 
 #define N_DIMENSIONS 2
 
-clock_t readHDFByHyperslab(const char *filename, const char* dataset,
-                            int **rdata,
+clock_t readHDFByHyperslab (const char *filename, const char *dataset,
+			    int **rdata,
 			    int rowsPerChunk, int columnsPerChunk,
 			    int nRowsOfChunks, int nColumnsOfChunks,
 			    int nIterations, int printFlag)
@@ -21,12 +21,9 @@ clock_t readHDFByHyperslab(const char *filename, const char* dataset,
   hsize_t stride[N_DIMENSIONS];
   hsize_t block[N_DIMENSIONS];
   hsize_t count[N_DIMENSIONS];
-  hsize_t dims[N_DIMENSIONS];
-  hsize_t chunk[N_DIMENSIONS];
 
   int nArrayRows = rowsPerChunk * nRowsOfChunks;
   int nArrayColumns = columnsPerChunk * nColumnsOfChunks;
-  hsize_t nChunks = nRowsOfChunks * nColumnsOfChunks;
 
   /* 
    * Open file and dataset using the default properties.
@@ -78,11 +75,6 @@ clock_t readHDFByHyperslab(const char *filename, const char* dataset,
   status = H5Sselect_hyperslab (space, H5S_SELECT_SET, start, stride, count,
 				block);
 
-  hsize_t chunkOffset[N_DIMENSIONS];
-  unsigned filter_mask;
-
-  hsize_t index;
-
   /* 
    * Read the data using the previously defined hyperslab.
    */
@@ -132,5 +124,3 @@ clock_t readHDFByHyperslab(const char *filename, const char* dataset,
   status = H5Fclose (file);
   return hdfSpan;
 }
-
-

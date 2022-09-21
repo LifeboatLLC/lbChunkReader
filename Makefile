@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-I. -I$(HDF5_INCLUDE_DIRS) 
+CFLAGS=-Wunused-variable -I. -I$(HDF5_INCLUDE_DIRS) 
 LIBS=-lpthread -lhdf5 -L$(HDF5_LIBRARIES)
 OBJ = lbChunkReader.o workerParameters.o printFunctions.o allocate2D.o getChunkInfo.o readDirectly.o writeHdfFile.o \
       readDirectlyWithThreads.o worker.o readHDFByHyperslab.o

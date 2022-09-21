@@ -6,6 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <time.h>
+#include <sys/stat.h>
 #include "workerParameters.h"
 #include "printFunctions.h"
 #include "allocate2D.h"
@@ -15,36 +16,39 @@
 #include "readDirectlyWithThreads.h"
 #include "readHDFByHyperslab.h"
 
-#define FILENAME "bigChunk.h5"
 #define DATASET  "DS1"
 #define N_DIMENSIONS 2
 void processCommandLine (int argc, char **argv,
+			 char **filename,
 			 int *rowsPerChunk, int *columnsPerChunk,
 			 int *nRowsOfChunks, int *nColumnsOfChunks,
-			 int *nThreads, int* copyToArray, int *nIterations, int *printFlag)
+			 int *nThreads, int *copyToArray, int *nIterations,
+			 int *printFlag)
 {
-  const int N_ARGS = 9;
+  const int N_ARGS = 10;
 
   if (argc != N_ARGS)
   {
     printf
-	 ("usage: %s <rowsPerChunk> <columnsPerChunk> <nRowsOfChunks> "
-	  "<nColumnsOfChunks> <nThreads> <copyToArray> <nIterations> <printDataFlag>\n", argv[0]);
+	 ("usage: %s <filename> <rowsPerChunk> <columnsPerChunk> <nRowsOfChunks> "
+	  "<nColumnsOfChunks> <nThreads> <copyToArray> <nIterations> <printDataFlag>\n",
+	  argv[0]);
     exit (0);
   }
   else
   {
-    sscanf (argv[1], "%d", rowsPerChunk);
-    sscanf (argv[2], "%d", columnsPerChunk);
-    sscanf (argv[3], "%d", nRowsOfChunks);
-    sscanf (argv[4], "%d", nColumnsOfChunks);
-    sscanf (argv[5], "%d", nThreads);
-    sscanf (argv[6], "%d", copyToArray);
-    sscanf (argv[7], "%d", nIterations);
-    sscanf (argv[8], "%d", printFlag);
+    *filename = argv[1], sscanf (argv[2], "%d", rowsPerChunk);
+    sscanf (argv[3], "%d", columnsPerChunk);
+    sscanf (argv[4], "%d", nRowsOfChunks);
+    sscanf (argv[5], "%d", nColumnsOfChunks);
+    sscanf (argv[6], "%d", nThreads);
+    sscanf (argv[7], "%d", copyToArray);
+    sscanf (argv[8], "%d", nIterations);
+    sscanf (argv[9], "%d", printFlag);
 
     if (*printFlag)
     {
+      printf ("Filename is %s\n", *filename);
       printf ("Rows per chunk = %d\n", *rowsPerChunk);
       printf ("Columns per chunk = %d\n", *columnsPerChunk);
       printf ("Number of rows of chunks = %d\n", *nRowsOfChunks);
@@ -54,6 +58,13 @@ void processCommandLine (int argc, char **argv,
       printf ("Number of iterations = %d\n", *nIterations);
     }
   }
+}
+
+bool fileExists (char *filename)
+{
+  struct stat statStruct;
+  int status = stat (filename, &statStruct);
+  return status == 0;
 }
 
 
@@ -67,17 +78,14 @@ int main (int argc, char **argv)
   int nIterations;
   int copyToArray;
   int printFlag;
+  char *filename;
 
   processCommandLine (argc, argv,
+		      &filename,
 		      &rowsPerChunk, &columnsPerChunk,
 		      &nRowsOfChunks, &nColumnsOfChunks,
-		      &nThreads, &copyToArray, &nIterations, 
-		      &printFlag);
+		      &nThreads, &copyToArray, &nIterations, &printFlag);
 
-
-  hid_t file, space, dset, dcpl;	/* Handles */
-  herr_t status;
-  H5D_layout_t layout;
   int nArrayRows = nRowsOfChunks * rowsPerChunk;
   int nArrayColumns = nColumnsOfChunks * columnsPerChunk;
   if (printFlag)
@@ -85,12 +93,6 @@ int main (int argc, char **argv)
     printf ("nArrayRows = %d\n", nArrayRows);
     printf ("nArrayColumns = %d\n", nArrayColumns);
   }
-
-  hsize_t dims[N_DIMENSIONS] = { nArrayRows, nArrayColumns },
-       chunk[N_DIMENSIONS] = { rowsPerChunk, columnsPerChunk },
-       start[N_DIMENSIONS],
-       stride[N_DIMENSIONS], count[N_DIMENSIONS], block[N_DIMENSIONS];
-  int i, j;
 
   // Dynamically allocate 2D arrays.
   int **wdata = (int **) allocateContiguous2dArray (nArrayRows,
@@ -100,10 +102,18 @@ int main (int argc, char **argv)
 						    nArrayColumns,
 						    sizeof (int));
   // Write the HDF file that we will read in the tests.
-  writeHdfFile (FILENAME, DATASET, wdata, rowsPerChunk,
-		columnsPerChunk, nRowsOfChunks, nColumnsOfChunks, printFlag);
+  if (!fileExists (filename))
+  {
+    printf ("Writing new HDF5 file %s.\n", filename);
+    writeHdfFile (filename, DATASET, wdata, rowsPerChunk,
+		  columnsPerChunk, nRowsOfChunks, nColumnsOfChunks, printFlag);
+  }
+  else
+  {
+    printf ("Using existing HDF5 file %s.\n", filename);
+  }
   // Read the data by HDF hyperslab
-  clock_t hdfSpan = readHDFByHyperslab (FILENAME, DATASET, rdata, rowsPerChunk,
+  clock_t hdfSpan = readHDFByHyperslab (filename, DATASET, rdata, rowsPerChunk,
 					columnsPerChunk, nRowsOfChunks,
 					nColumnsOfChunks, nIterations,
 					printFlag);
@@ -113,28 +123,28 @@ int main (int argc, char **argv)
   hsize_t maxChunkSize;
   hsize_t nChunks = nRowsOfChunks * nColumnsOfChunks;
 
-  hsize_t* chunkSizeInBytes = (hsize_t *) malloc (nChunks * sizeof (hsize_t));
+  hsize_t *chunkSizeInBytes = (hsize_t *) malloc (nChunks * sizeof (hsize_t));
 
   allChunkOffsets = (hsize_t **)
-       allocateContiguous2dArray (nChunks, N_DIMENSIONS, sizeof (hsize_t));
+       allocateContiguous2dArray (nRowsOfChunks, nColumnsOfChunks,
+				  sizeof (hsize_t));
 
 
-  getChunkInfo (FILENAME, DATASET, rowsPerChunk, columnsPerChunk,
+  getChunkInfo (filename, DATASET, rowsPerChunk, columnsPerChunk,
 		nRowsOfChunks, nColumnsOfChunks,
 		chunkSizeInBytes, allChunkOffsets, &maxChunkSize, printFlag);
 
-
   printf ("Reading direct\n");
-  clock_t directSpan = readDirectly (FILENAME,
+  clock_t directSpan = readDirectly (filename,
 				     rdata,
 				     rowsPerChunk, columnsPerChunk,
 				     nRowsOfChunks, nColumnsOfChunks,
 				     chunkSizeInBytes,
 				     allChunkOffsets,
 				     maxChunkSize,
-                                     copyToArray,
-				     nIterations, 
-                                     printFlag);
+				     copyToArray,
+				     nIterations,
+				     printFlag);
 
 
   printf ("Direct time = %ld\n\n", directSpan);
@@ -144,15 +154,21 @@ int main (int argc, char **argv)
 		  rdata, nArrayRows, nArrayColumns);
   }
 
-  clock_t threadSpan = readDirectlyWithThreads (FILENAME,
+  clock_t threadSpan = readDirectlyWithThreads (filename,
 						rdata,
 						rowsPerChunk, columnsPerChunk,
 						nRowsOfChunks, nColumnsOfChunks,
 						chunkSizeInBytes,
 						allChunkOffsets,
-						maxChunkSize, copyToArray, 
-                                                nThreads,
+						maxChunkSize, copyToArray,
+						nThreads,
 						nIterations, printFlag);
+
+  if (printFlag)
+  {
+    print2dArray ("Data as read threaded direct read",
+		  rdata, nArrayRows, nArrayColumns);
+  }
 
   printf ("Thread time is %ld\n\n", threadSpan);
   printf ("HDF/Direct is %lf\n", ((double) hdfSpan) / (double) directSpan);
@@ -160,10 +176,9 @@ int main (int argc, char **argv)
 
   // Deallocate all dynamically allocated memory.
 
-  
-  free(chunkSizeInBytes);
+  free (chunkSizeInBytes);
   dealloc2dArray ((void **) wdata, nArrayRows);
   dealloc2dArray ((void **) rdata, nArrayRows);
-  dealloc2dArray ((void **) allChunkOffsets, nChunks);
+  dealloc2dArray ((void **) allChunkOffsets, nRowsOfChunks);
   return 0;
 }
