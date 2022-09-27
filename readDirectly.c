@@ -6,6 +6,7 @@
 #include "hdf5.h"
 
 /* Read an HDF file using direct reads, rather than using */
+
 /* the HDF library.*/
 clock_t readDirectly (const char *filename, int **rdata,
 		      int rowsPerChunk, int columnsPerChunk,

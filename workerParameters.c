@@ -3,7 +3,9 @@
 #include "workerParameters.h"
 
 /* The worker threads receive all their parameters in */
+
 /* a struct WorderParameters structure.  setWorkerParameters */
+
 /* loads the struct with the values that provided. */
 void setWorkerParameters (struct WorkerParameters *params,
 			  haddr_t ** chunkLocationInFile,

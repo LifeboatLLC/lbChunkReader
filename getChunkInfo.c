@@ -5,6 +5,7 @@
 #define N_DIMENSIONS 2
 
 /* Extract the chunk locations and chunk sizes from an */
+
 /* hdf file.*/
 void getChunkInfo (const char *filename,
 		   const char *datasetName,
@@ -14,7 +15,7 @@ void getChunkInfo (const char *filename,
 		   hsize_t ** allChunkOffsets, hsize_t * maxChunkSize,
 		   int printFlag)
 {
-  hid_t file, space, dset, dcpl;	
+  hid_t file, space, dset, dcpl;
   herr_t status;
 
   hsize_t start[N_DIMENSIONS];

@@ -137,13 +137,13 @@ int main (int argc, char **argv)
 				  sizeof (hsize_t));
 
 
-  /* Fill in the chunkSizeInBytes and allChunkOffsets arrays with  */
+  /* Fill in the chunkSizeInBytes and allChunkOffsets arrays with */
   /* information from the HDF file. */
   getChunkInfo (filename, DATASET, rowsPerChunk, columnsPerChunk,
 		nRowsOfChunks, nColumnsOfChunks,
 		chunkSizeInBytes, allChunkOffsets, &maxChunkSize, printFlag);
 
-  /* Use the chunk info to read the chunks without the use of the HDF  */
+  /* Use the chunk info to read the chunks without the use of the HDF */
   /* library. */
   printf ("Reading direct\n");
   clock_t directSpan = readDirectly (filename,
@@ -165,7 +165,7 @@ int main (int argc, char **argv)
 		  rdata, nArrayRows, nArrayColumns);
   }
 
-  /* Perform direct reads with threads.  A subset of chunks is  */
+  /* Perform direct reads with threads.  A subset of chunks is */
   /* read by each thread. */
   clock_t threadSpan = readDirectlyWithThreads (filename,
 						rdata,
