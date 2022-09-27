@@ -4,8 +4,8 @@
 #include "allocate2D.h"
 #define N_DIMENSIONS 2
 
-// Extract the chunk locations and chunk sizes from an 
-// hdf file.
+/* Extract the chunk locations and chunk sizes from an */
+/* hdf file.*/
 void getChunkInfo (const char *filename,
 		   const char *datasetName,
 		   int rowsPerChunk, int columnsPerChunk,
@@ -14,7 +14,7 @@ void getChunkInfo (const char *filename,
 		   hsize_t ** allChunkOffsets, hsize_t * maxChunkSize,
 		   int printFlag)
 {
-  hid_t file, space, dset, dcpl;	/* Handles */
+  hid_t file, space, dset, dcpl;	
   herr_t status;
 
   hsize_t start[N_DIMENSIONS];
@@ -22,17 +22,17 @@ void getChunkInfo (const char *filename,
   hsize_t block[N_DIMENSIONS];
   hsize_t count[N_DIMENSIONS];
 
-  // Determine the total number of chunks
+  /* Determine the total number of chunks */
   hsize_t nChunks = nRowsOfChunks * nColumnsOfChunks;
 
-  // Open the file and the data set.
+  /* Open the file and the data set. */
   file = H5Fopen (filename, H5F_ACC_RDONLY, H5P_DEFAULT);
   dset = H5Dopen (file, datasetName, H5P_DEFAULT);
 
-  // Retrieve the dataset creation property list.
+  /* Retrieve the dataset creation property list. */
   dcpl = H5Dget_create_plist (dset);
 
-  // Define and select the hyperslab to use for reading.
+  /* Define and select the hyperslab to use for reading. */
   space = H5Dget_space (dset);
 
   start[0] = 0;
@@ -51,8 +51,8 @@ void getChunkInfo (const char *filename,
 
   hsize_t index;
 
-  // Find the maximum chunk size.
-  // In this example all chunks should be the same size.
+  /* Find the maximum chunk size. */
+  /* In this example all chunks should be the same size. */
   *maxChunkSize = 0;
 
   if (printFlag)
@@ -102,7 +102,7 @@ void getChunkInfo (const char *filename,
       for (j = 0; j < nColumnsOfChunks; j++)
       {
 	printf
-	     ("\tchunkRow = %d: chunkColumn =%d: index = %ld: nBytes %ld: address: %ld\n",
+	     ("\tchunkRow = %d: chunkColumn =%d: index = %d: nBytes %ld: address: %ld\n",
 	      i, j, index, chunkSizeInBytes[index++], allChunkOffsets[i][j]);
       }
     }

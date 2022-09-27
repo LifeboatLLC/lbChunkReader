@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "printFunctions.h"
 
-// Print a small 2d array.
+/* Print a small 2d array. */
 void print2dArray (const char *message, int **data, int nRows, int nColumns)
 {
   int i, j;

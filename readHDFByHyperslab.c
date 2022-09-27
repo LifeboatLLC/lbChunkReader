@@ -41,7 +41,8 @@ clock_t readHDFByHyperslab (const char *filename, const char *dataset,
   /* 
    * Read the data using the default properties.
    */
-  // rdata[0] is the address of the contiguous block of memory
+
+  /* rdata[0] is the address of the contiguous block of memory */
   status = H5Dread (dset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT,
 		    rdata[0]);
 
@@ -84,7 +85,7 @@ clock_t readHDFByHyperslab (const char *filename, const char *dataset,
 
   clock_t beginHDF = clock ();
 
-  // Read all the data, one chunk at a time.
+  /* Read all the data, one chunk at a time. */
   for (iteration = 0; iteration < nIterations; ++iteration)
   {
     for (start[0] = 0; start[0] < nRowsOfChunks * rowsPerChunk;

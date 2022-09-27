@@ -3,15 +3,15 @@
 
 #define N_DIMENSIONS 2
 
-// Write an hdf file representing an int 2d array.
-// The file is written in chunks.
+/* Write an hdf file representing an int 2d array. */
+/* The file is written in chunks. */
 
 void writeHdfFile (const char *filename, const char *datasetName,
 		   int **wdata,
 		   int rowsPerChunk, int columnsPerChunk,
 		   int nRowsOfChunks, int nColumnsOfChunks, int printFlag)
 {
-  hid_t file, space, dset, dcpl;	/* Handles */
+  hid_t file, space, dset, dcpl;	
   herr_t status;
 
   hsize_t start[N_DIMENSIONS];
@@ -68,7 +68,7 @@ void writeHdfFile (const char *filename, const char *datasetName,
   /* 
    * Create the chunked dataset.
    */
-  // H5Dcreate(file, datasetName, datatype, dataspaceId, 
+
   dset = H5Dcreate (file, datasetName, H5T_STD_I32LE, space, H5P_DEFAULT, dcpl,
 		    H5P_DEFAULT);
 

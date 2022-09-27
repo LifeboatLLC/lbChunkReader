@@ -94,14 +94,15 @@ int main (int argc, char **argv)
     printf ("nArrayColumns = %d\n", nArrayColumns);
   }
 
-  // Dynamically allocate 2D arrays.
+  /* Dynamically allocate 2D arrays. */
   int **wdata = (int **) allocateContiguous2dArray (nArrayRows,
 						    nArrayColumns,
 						    sizeof (int));
   int **rdata = (int **) allocateContiguous2dArray (nArrayRows,
 						    nArrayColumns,
 						    sizeof (int));
-  // Write the HDF file that we will read in the tests.
+
+  /* Write the HDF file that we will read in the tests. */
   if (!fileExists (filename))
   {
     printf ("Writing new HDF5 file %s.\n", filename);
@@ -112,7 +113,7 @@ int main (int argc, char **argv)
   {
     printf ("Using existing HDF5 file %s.\n", filename);
   }
-  // Read the data by HDF hyperslab
+  /* Read the data by HDF hyperslab */
   clock_t hdfSpan = readHDFByHyperslab (filename, DATASET, rdata, rowsPerChunk,
 					columnsPerChunk, nRowsOfChunks,
 					nColumnsOfChunks, nIterations,
@@ -125,25 +126,25 @@ int main (int argc, char **argv)
   hsize_t maxChunkSize;
   hsize_t nChunks = nRowsOfChunks * nColumnsOfChunks;
 
-  // Allocate an array to hold the number of bytes in each chunk.
+  /* Allocate an array to hold the number of bytes in each chunk. */
   hsize_t *chunkSizeInBytes = (hsize_t *) malloc (nChunks * sizeof (hsize_t));
 
-  // Allocate a 2d array with nRowsOfChunks rows and nColumnOfChunks columns.
-  // This array will store the offset in the file for each chunk.  Chunks
-  // will be accessed using the row, column of the chunk.
+  /* Allocate a 2d array with nRowsOfChunks rows and nColumnOfChunks columns. */
+  /* This array will store the offset in the file for each chunk.  Chunks */
+  /* will be accessed using the row, column of the chunk. */
   allChunkOffsets = (hsize_t **)
        allocateContiguous2dArray (nRowsOfChunks, nColumnsOfChunks,
 				  sizeof (hsize_t));
 
 
-  // Fill in the chunkSizeInBytes and allChunkOffsets arrays with 
-  // information from the HDF file.
+  /* Fill in the chunkSizeInBytes and allChunkOffsets arrays with  */
+  /* information from the HDF file. */
   getChunkInfo (filename, DATASET, rowsPerChunk, columnsPerChunk,
 		nRowsOfChunks, nColumnsOfChunks,
 		chunkSizeInBytes, allChunkOffsets, &maxChunkSize, printFlag);
 
-  // Use the chunk info to read the chunks without the use of the HDF 
-  // library.
+  /* Use the chunk info to read the chunks without the use of the HDF  */
+  /* library. */
   printf ("Reading direct\n");
   clock_t directSpan = readDirectly (filename,
 				     rdata,
@@ -164,8 +165,8 @@ int main (int argc, char **argv)
 		  rdata, nArrayRows, nArrayColumns);
   }
 
-  // Perform direct reads with threads.  A subset of chunks is 
-  // read by each thread.
+  /* Perform direct reads with threads.  A subset of chunks is  */
+  /* read by each thread. */
   clock_t threadSpan = readDirectlyWithThreads (filename,
 						rdata,
 						rowsPerChunk, columnsPerChunk,
@@ -186,7 +187,7 @@ int main (int argc, char **argv)
   printf ("HDF/Direct is %lf\n", ((double) hdfSpan) / (double) directSpan);
   printf ("HDF/Thread is %lf\n", ((double) hdfSpan) / (double) threadSpan);
 
-  // Deallocate all dynamically allocated memory.
+  /* Deallocate all dynamically allocated memory. */
 
   free (chunkSizeInBytes);
   dealloc2dArray ((void **) wdata, nArrayRows);
