@@ -47,6 +47,7 @@ void *worker (void *inStruct)
 
       int chunkRow;
       int chunkColumn;
+
       // Copy the data from the chunk to the array
       if (params->copyToArray)
       {

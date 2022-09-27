@@ -22,7 +22,7 @@ represents the data in a 2-dimensional array written in chunks.
 <nColumnsOfChunks> is the number of chunks in an array row.
 <nThreads> is the number of threads to employ for threaded reads.
 <copyToArray> if true, copies the chunked read to the corresponing cells in the array.
-<nIterations> is the number of times the entire of collection of chunks should be read.
+<nIterations> is the number of times the entire collection of chunks should be read.
 <printDataFlag> if true, prints data to the screen.  Typically this flag should be 0, unless
                 the data set is small enough to fit on the screen.
 

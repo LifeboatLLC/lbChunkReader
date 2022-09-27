@@ -1,4 +1,4 @@
- You can build the executable using the Makefile.
+ You can build the executable using the Makefile.  Simply type make at the command prompt.
 
  You will have to set the following envirnoment variables:
        HDF5_DIR set to your HDF5 Path (this will probably end in a version number)

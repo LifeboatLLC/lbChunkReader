@@ -3,6 +3,9 @@
 
 #define N_DIMENSIONS 2
 
+// Write an hdf file representing an int 2d array.
+// The file is written in chunks.
+
 void writeHdfFile (const char *filename, const char *datasetName,
 		   int **wdata,
 		   int rowsPerChunk, int columnsPerChunk,
