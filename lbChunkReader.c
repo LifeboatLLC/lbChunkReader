@@ -103,17 +103,14 @@ int main (int argc, char **argv)
 						    sizeof (int));
 
   /* Write the HDF file that we will read in the tests. */
-  if (!fileExists (filename))
-  {
-    printf ("Writing new HDF5 file %s.\n", filename);
-    writeHdfFile (filename, DATASET, wdata, rowsPerChunk,
-		  columnsPerChunk, nRowsOfChunks, nColumnsOfChunks, printFlag);
-  }
-  else
-  {
-    printf ("Using existing HDF5 file %s.\n", filename);
-  }
+  printf ("Writing new HDF5 file %s.\n", filename);
+  writeHdfFile (filename, DATASET, wdata, rowsPerChunk,
+                columnsPerChunk, nRowsOfChunks, nColumnsOfChunks, printFlag);
+
   /* Read the data by HDF hyperslab */
+
+  printf("Reading with HDF5 Library\n");
+
   clock_t hdfSpan = readHDFByHyperslab (filename, DATASET, rdata, rowsPerChunk,
 					columnsPerChunk, nRowsOfChunks,
 					nColumnsOfChunks, nIterations,
@@ -137,6 +134,7 @@ int main (int argc, char **argv)
 				  sizeof (hsize_t));
 
 
+  printf("Getting chunk info\n");
   /* Fill in the chunkSizeInBytes and allChunkOffsets arrays with */
   /* information from the HDF file. */
   getChunkInfo (filename, DATASET, rowsPerChunk, columnsPerChunk,

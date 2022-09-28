@@ -61,12 +61,14 @@ void getChunkInfo (const char *filename,
     printf ("\nExtracted HDF5 chunk info: \n");
   }
 
+  const hsize_t nReports = 4;
+  hsize_t reportChunks = nChunks / nReports;
   int chunkRow = 0;
   int chunkColumn = 0;
   for (index = 0; index < nChunks; index++)
   {
 
-
+    if (index % reportChunks == 0) printf("Getting chunk info %ld of %ld\n", index, nChunks);
     status = H5Dget_chunk_info (dset, space, index, chunkOffset,
 				&filter_mask,
 				&allChunkOffsets[chunkRow][chunkColumn],

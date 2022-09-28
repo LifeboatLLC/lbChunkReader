@@ -79,7 +79,6 @@ clock_t readHDFByHyperslab (const char *filename, const char *dataset,
   /* 
    * Read the data using the previously defined hyperslab.
    */
-  printf ("Reading with hdf5\n");
   int iteration;
   int chunkCount = 0;
 

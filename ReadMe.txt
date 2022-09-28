@@ -12,17 +12,24 @@ lbChunkReader reads chunks into a 2-dimensional array using 3 different methods:
             via H5Dget_chunk_info.  In this mode each thread is responsible for
             reading a subset of the chunks. 
 
-If <filename> does not exist, the program writes the file with the specified parameters.  
-Otherwise, the program uses the existing file.  In either case, the file data 
-represents the data in a 2-dimensional array written in chunks.
+<filename> is the name of the HDF5 file the program will write using the 
+specified parameters.  The file data represents the data in a 2-dimensional 
+array written in chunks.
 
 <rowsPerChunK> is the number of array rows in a single chunk.
+
 <columnsPerChunk> is the number of array columns in a single chunk.
+
 <nRowsOfChunks> is the number of chunks in an array column.
+
 <nColumnsOfChunks> is the number of chunks in an array row.
+
 <nThreads> is the number of threads to employ for threaded reads.
+
 <copyToArray> if true, copies the chunked read to the corresponing cells in the array.
+
 <nIterations> is the number of times the entire collection of chunks should be read.
+
 <printDataFlag> if true, prints data to the screen.  Typically this flag should be 0, unless
                 the data set is small enough to fit on the screen.
 
